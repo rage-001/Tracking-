@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Live Tracker</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <style>#map { height: 90vh; width: 100%; }</style>
+</head>
+<body>
+  <h2>Track Live Location</h2>
+  <input type="text" id="trackNum" placeholder="Enter mobile number" />
+  <button onclick="track()">Track</button>
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      databaseURL: "https://YOUR_PROJECT.firebaseio.com",
+      projectId: "YOUR_PROJECT",
+      storageBucket: "YOUR_PROJECT.appspot.com",
+      messagingSenderId: "YOUR_ID",
+      appId: "YOUR_APP_ID"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    let map = L.map('map').setView([20, 78], 5);
+    let marker = null;
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+    function track() {
+      const phone = document.getElementById("trackNum").value.trim();
+      if (!phone) return;
+
+      db.ref("locations/" + phone).on("value", (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          const { lat, lng } = data;
+          if (marker) marker.setLatLng([lat, lng]);
+          else marker = L.marker([lat, lng]).addTo(map);
+          map.setView([lat, lng], 15);
+        }
+      });
+    }
+  </script>
+</body>
+</html>
